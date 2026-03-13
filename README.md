@@ -152,7 +152,7 @@ Let N be the total number of events, S the number of negative-weight seeds, and 
 
 **Cell construction for one seed:** Growing a cell requires k nearest-neighbor queries (one per event added to the cell). Each query also needs an exclusion set lookup, which is O(1) amortized for `std::unordered_set`. Total per cell: **O(k log N)**.
 
-**Full resampling:** We process S seeds, but some are skipped (their weight already became non-negative). Let S' <= S be the number of cells actually formed. Total: **O(S' * k * log N)**.
+**Full resampling: We process S seeds, but some are skipped (their weight already became non-negative). Let S' <= S be the number of cells actually formed. Total: O(S' * k * log N).**
 
 **Putting it together:**
 
@@ -161,6 +161,10 @@ For our dataset: N = 4500, S = 1500, S' = 1050, k_avg = 2.96.
 In the worst case, S and S'*k are both O(N) (every event is a seed and every cell pulls in a constant fraction of events), which gives **O(N^2 log N)**. But in practice, k is small and roughly constant (around 3 in our run, and it does not grow with N because larger samples have higher event density, so cells need fewer neighbors to accumulate enough positive weight). This makes the practical/average complexity to be **O(N log N)**.
 
 For comparison, the brute-force approach without a k-d tree would be O(N^2), which is what Section 2.2 of [arXiv:2303.15246](https://arxiv.org/abs/2303.15246) identifies as the bottleneck for large samples.
+
+### Space Complexity
+
+The k-d tree stores one node per event, each holding an index and two child pointers, **O(N)**. The exclusion set for each cell grows up to k entries: **O(k)**. The seed list and cell records are both **O(S)**. Hence overall memory usage is **O(N)**.
 
 ## Discussion Question
 
