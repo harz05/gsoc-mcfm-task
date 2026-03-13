@@ -158,7 +158,7 @@ Let N be the total number of events, S the number of negative-weight seeds, and 
 
 For our dataset: N = 4500, S = 1500, S' = 1050, k_avg = 2.96.
 
-In the worst case, S and S'*k are both O(N) (every event is a seed and every cell pulls in a constant fraction of events), which gives **O(N^2 log N)**. But in practice, k is small and roughly constant (around 3 in our run, and it does not grow with N because larger samples have higher event density, so cells need fewer neighbors to accumulate enough positive weight). This makes the practical complexity **O(N log N)**.
+In the worst case, S and S'*k are both O(N) (every event is a seed and every cell pulls in a constant fraction of events), which gives **O(N^2 log N)**. But in practice, k is small and roughly constant (around 3 in our run, and it does not grow with N because larger samples have higher event density, so cells need fewer neighbors to accumulate enough positive weight). This makes the practical/average complexity to be **O(N log N)**.
 
 For comparison, the brute-force approach without a k-d tree would be O(N^2), which is what Section 2.2 of [arXiv:2303.15246](https://arxiv.org/abs/2303.15246) identifies as the bottleneck for large samples.
 
@@ -178,17 +178,17 @@ The algorithm would consider Pair B "closer" and preferentially group events tha
 
 ### What happens without scaling
 
-When weights are redistributed within such elongated cells, weight moves between events that would fall in different rapidity bins. This distorts the rapidity distribution. Specifically, the distribution would get smeared: peaks would be flattened and tails would be inflated, because weight from the central (high-density) region migrates to the edges.
+When weights are redistributed within such elongated cells, weight moves between events that would fall in different rapidity bins. This distorts the rapidity distribution. Specifically, the distribution would get smeared. Peaks would be flattened and tails would be inflated, because weight from the central (high-density) region migrates to the edges.
 
-The pt distribution would be better preserved because cells would be narrow in that direction. So the damage is asymmetric: the observable whose coordinate has the smaller numerical range gets smeared more.
+The pt distribution would be better preserved because cells would be narrow in that direction. So the damage is asymmetric i.e. the observable whose coordinate has the smaller numerical range gets smeared more.
 
-The scaling factor corrects this by making the distance metric "isotropic" in terms of physical significance. The factor 100 is roughly (pt_range / y_range)^2 = (280/10)^2 ≈ 784, so 100 is the right order of magnitude. This is analogous to the tau parameter in Equation 2.11 of [arXiv:2109.07851](https://arxiv.org/abs/2109.07851), which rescales the transverse momentum component of the distance function.
+**The scaling factor corrects this by making the distance metric "isotropic" in terms of physical significance.** The factor 100 is roughly (pt_range / y_range)^2 = (280/10)^2 ≈ 784, so 100 is the right order of magnitude. This is analogous to the tau parameter in Equation 2.11 of [arXiv:2109.07851](https://arxiv.org/abs/2109.07851), which rescales the transverse momentum component of the distance function.
 
 ### The infinite-events limit
 
 In the limit of infinite generated events, the event density becomes arbitrarily high everywhere in phase space. Cells shrink to infinitesimal size regardless of their shape. Even highly elongated cells (from an unscaled metric) would become so small that all events within a cell fall in the same histogram bin in every direction.
 
-Formally, as N approaches infinity, the cell radius R approaches 0 (Paper 1, Figure 2 shows this convergence). When R is 0, no weight migrates between bins, and the scaling factor becomes irrelevant.
+Formally, as N approaches infinity, the cell radius R approaches 0. When R is 0, no weight migrates between bins, and the scaling factor becomes irrelevant.
 
 But we never have infinite events. With finite statistics, the scaling factor controls how the finite cell size is distributed across dimensions. A good scaling factor ensures that the unavoidable smearing is spread evenly across all observables rather than concentrated in one.
 
